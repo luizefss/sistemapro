@@ -1,27 +1,23 @@
-// Importações no topo
+// src/styles.scss
 @use '@angular/material' as mat;
-@use 'swiper/css' as *;
-@use 'swiper/css/navigation' as *;
-@use 'swiper/css/pagination' as *;
-@use 'swiper/css/scrollbar' as *;
 
+@include mat.core();
 
+$primary-palette: mat.define-palette(mat.$indigo-palette);
+$accent-palette: mat.define-palette(mat.$amber-palette);
 
-// Definição das paletas de cores
+$theme: mat.define-light-theme((color: (primary: $primary-palette,
+                accent: $accent-palette,
+            )));
 
+@include mat.all-component-themes($theme);
 
-// Definição do tema
-.cdk-overlay-container {
-    z-index: 1000;
-}
+// Swiper styles
+@import 'swiper/css';
+@import 'swiper/css/navigation';
+@import 'swiper/css/pagination';
 
-.cdk-overlay-backdrop {
-    background-color: rgba(0, 0, 0, 0.6);
-    /* Ajuste a opacidade conforme necessário */
-}
-
-
-// Estilos globais
+// Global styles
 html,
 body {
     height: 100%;
@@ -47,18 +43,4 @@ h5,
 h6 {
     margin: 0;
     line-height: 1.2;
-}
-
-.action-buttons {
-    display: flex;
-    gap: 8px;
-    /* Espaço entre os botões */
-}
-
-button[mat-flat-button] {
-    color: white;
-}
-
-button[mat-raised-button] {
-    font-weight: bold;
 }
