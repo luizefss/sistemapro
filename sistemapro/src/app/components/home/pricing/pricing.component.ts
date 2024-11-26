@@ -1,20 +1,39 @@
-// components/pricing.component.ts
+// src/app/components/home/pricing/pricing.component.ts
 import { CommonModule } from '@angular/common';
 import { Component, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { Plan } from '../../../shared/interfaces/plans.interface';
+import { Router } from '@angular/router';
+
+interface PlanPrice {
+  monthly: number;
+  yearly: number;
+}
+
+interface Plan {
+  id: string;
+  name: string;
+  price: PlanPrice;
+  features: string[];
+  isFeatured?: boolean;
+}
 
 @Component({
   selector: 'app-pricing',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule, MatIconModule, MatSlideToggleModule],
+  imports: [
+    CommonModule, 
+    MatCardModule, 
+    MatButtonModule, 
+    MatIconModule, 
+    MatSlideToggleModule
+  ],
   template: `
     <section class="pricing">
       <div class="container">
-        <h2>Escolha seu plano</h2>
+        <h2 class="text-center text-3xl font-bold mb-8">Escolha seu plano</h2>
         
         <div class="billing-toggle">
           <span [class.active]="!isYearly()">Mensal</span>
@@ -40,12 +59,14 @@ import { Plan } from '../../../shared/interfaces/plans.interface';
                 <mat-card-subtitle>
                   <div class="price">
                     <span class="currency">R$</span>
-                    <span class="amount">{{isYearly() ? plan.price.yearly/12 : plan.price.monthly}}</span>
+                    <span class="amount">
+                      {{isYearly() ? (plan.price.yearly/12).toFixed(0) : plan.price.monthly.toFixed(0)}}
+                    </span>
                     <span class="period">/mês</span>
                   </div>
                   @if(isYearly()) {
                     <div class="yearly-price">
-                      R$ {{plan.price.yearly}} faturado anualmente
+                      R$ {{plan.price.yearly.toFixed(0)}} faturado anualmente
                     </div>
                   }
                 </mat-card-subtitle>
@@ -123,10 +144,20 @@ import { Plan } from '../../../shared/interfaces/plans.interface';
     mat-card {
       position: relative;
       padding: 24px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      }
 
       &.featured {
         transform: scale(1.05);
         border: 2px solid #ff4081;
+
+        &:hover {
+          transform: scale(1.05) translateY(-5px);
+        }
       }
     }
 
@@ -147,6 +178,7 @@ import { Plan } from '../../../shared/interfaces/plans.interface';
       .currency {
         font-size: 1.25rem;
         vertical-align: top;
+        margin-right: 4px;
       }
 
       .amount {
@@ -156,6 +188,7 @@ import { Plan } from '../../../shared/interfaces/plans.interface';
 
       .period {
         color: #666;
+        margin-left: 4px;
       }
     }
 
@@ -190,19 +223,97 @@ import { Plan } from '../../../shared/interfaces/plans.interface';
       button {
         width: 100%;
         height: 48px;
+        font-weight: 500;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .plans-grid {
+        grid-template-columns: 1fr;
+      }
+
+      mat-card.featured {
+        transform: none;
+        order: -1;
+      }
+
+      .billing-toggle {
+        .discount-badge {
+          position: static;
+          margin-left: 8px;
+        }
       }
     }
   `]
 })
 export default class PricingComponent {
-  isYearly = signal(false);
-  plans = PLANS;
+  isYearly = signal<boolean>(false);
+
+  plans: Plan[] = [
+    {
+      id: 'starter',
+      name: 'Starter',
+      price: {
+        monthly: 99,
+        yearly: 948 // 79/mês
+      },
+      features: [
+        'Até 2 usuários',
+        '10GB de armazenamento',
+        'Suporte por email',
+        'Recursos básicos',
+        'Atualizações gratuitas'
+      ]
+    },
+    {
+      id: 'professional',
+      name: 'Professional',
+      price: {
+        monthly: 199,
+        yearly: 1908 // 159/mês
+      },
+      features: [
+        'Até 5 usuários',
+        '50GB de armazenamento',
+        'Suporte prioritário',
+        'Todos os recursos',
+        'API disponível',
+        'Integrações avançadas'
+      ],
+      isFeatured: true
+    },
+    {
+      id: 'enterprise',
+      name: 'Enterprise',
+      price: {
+        monthly: 399,
+        yearly: 3828 // 319/mês
+      },
+      features: [
+        'Usuários ilimitados',
+        '500GB de armazenamento',
+        'Suporte 24/7',
+        'Recursos customizados',
+        'API ilimitada',
+        'Treinamento dedicado',
+        'Manager exclusivo'
+      ]
+    }
+  ];
+
+  constructor(private router: Router) {}
 
   toggleBilling() {
     this.isYearly.update(value => !value);
   }
 
   selectPlan(plan: Plan) {
-    // Implementar navegação para checkout
+    // Implementar navegação para checkout com o plano selecionado
+    this.router.navigate(['/checkout'], { 
+      queryParams: { 
+        plan: plan.id,
+        billing: this.isYearly() ? 'yearly' : 'monthly'
+      }
+    });
   }
 }

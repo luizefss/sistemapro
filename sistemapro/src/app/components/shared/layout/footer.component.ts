@@ -51,7 +51,7 @@ import { MatIconModule } from '@angular/material/icon';
            <ul class="contact-info">
              <li>
                <mat-icon>email</mat-icon>
-               contato@autooffice.com
+                 <span>contato&#64;autooffice.com</span>
              </li>
              <li>
                <mat-icon>phone</mat-icon>
