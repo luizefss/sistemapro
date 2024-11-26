@@ -3,196 +3,142 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatExpansionModule } from '@angular/material/expansion';
-import { MatIconModule } from '@angular/material/icon';
-
-interface FaqCategory {
-  name: string;
-  icon: string;
-  questions: {
-    question: string;
-    answer: string;
-  }[];
-}
 
 @Component({
   selector: 'app-faq',
   standalone: true,
-  imports: [
-    CommonModule,
-    MatExpansionModule,
-    MatIconModule,
-    MatButtonModule
-  ],
+  imports: [CommonModule, MatExpansionModule, MatButtonModule],
   template: `
     <section class="faq-section">
-      <div class="container mx-auto px-4 py-16">
-        <div class="text-center mb-12">
-          <h2 class="text-3xl font-bold mb-4">Perguntas Frequentes</h2>
-          <p class="text-gray-600 max-w-2xl mx-auto">
-            Encontre respostas para as dúvidas mais comuns sobre nossa plataforma
-          </p>
-        </div>
+      <div class="container">
+        <h2>Perguntas Frequentes</h2>
+        <p class="section-subtitle">
+          Tire suas dúvidas sobre nossa plataforma
+        </p>
 
-        <!-- Categorias de FAQ -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-          @for (category of faqCategories; track category.name) {
-            <button
-              class="category-card"
-              [class.active]="selectedCategory === category.name"
-              (click)="selectCategory(category.name)"
-            >
-              <mat-icon class="text-4xl mb-3">{{category.icon}}</mat-icon>
-              <h3 class="text-lg font-semibold">{{category.name}}</h3>
-            </button>
-          }
-        </div>
-
-        <!-- Accordion de perguntas -->
-        <div class="max-w-3xl mx-auto">
-          <mat-accordion class="faq-accordion" multi>
-            @for (category of faqCategories; track category.name) {
-              @if (category.name === selectedCategory) {
-                @for (item of category.questions; track item.question) {
-                  <mat-expansion-panel class="mb-4">
-                    <mat-expansion-panel-header>
-                      <mat-panel-title>
-                        {{item.question}}
-                      </mat-panel-title>
-                    </mat-expansion-panel-header>
-                    <div class="py-4">
-                      <p class="text-gray-700">{{item.answer}}</p>
-                    </div>
-                  </mat-expansion-panel>
-                }
-              }
+        <div class="faq-grid">
+          <mat-accordion>
+            @for(faq of faqs; track faq.question) {
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    {{faq.question}}
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <p [innerHTML]="faq.answer"></p>
+              </mat-expansion-panel>
             }
           </mat-accordion>
-        </div>
 
-        <!-- CTA de Suporte -->
-        <div class="text-center mt-12">
-          <p class="text-gray-600 mb-4">Não encontrou o que procurava?</p>
-          <button mat-raised-button color="primary">
-            Falar com Suporte
-            <mat-icon class="ml-2">headset_mic</mat-icon>
-          </button>
+          <div class="support-card">
+            <h3>Ainda tem dúvidas?</h3>
+            <p>Nossa equipe está pronta para ajudar você</p>
+            <div class="support-options">
+              <a href="/suporte" mat-raised-button color="primary">
+                Centro de Ajuda
+              </a>
+              <a href="/contato" mat-stroked-button>
+                Falar com Consultor
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </section>
   `,
   styles: [`
     .faq-section {
-      background: linear-gradient(to bottom, #ffffff, #f8f9fa);
+      padding: 80px 0;
     }
 
-    .category-card {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2rem;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      transition: all 0.3s ease;
-      border: 2px solid transparent;
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
     }
 
-    .category-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    h2 {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 16px;
+      color: #1976d2;
     }
 
-    .category-card.active {
-      border-color: #1976d2;
-      background-color: #e3f2fd;
+    .section-subtitle {
+      text-align: center;
+      font-size: 1.25rem;
+      color: #666;
+      margin-bottom: 48px;
     }
 
-    .faq-accordion {
+    .faq-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 48px;
+      align-items: start;
+    }
+
+    mat-accordion {
       .mat-expansion-panel {
+        margin-bottom: 16px;
         border-radius: 8px;
-        margin-bottom: 1rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
-        
-        &:not(.mat-expanded) {
-          &:hover {
-            background-color: #fafafa;
-          }
-        }
-      }
-
-      .mat-expansion-panel-header {
-        padding: 1.5rem;
       }
     }
 
-    ::ng-deep {
-      .mat-expansion-panel-body {
-        padding: 0 24px 24px !important;
+    .support-card {
+      background: #f8f9fa;
+      padding: 32px;
+      border-radius: 8px;
+      text-align: center;
+
+      h3 {
+        margin-bottom: 16px;
+      }
+
+      p {
+        color: #666;
+        margin-bottom: 24px;
+      }
+
+      .support-options {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .faq-grid {
+        grid-template-columns: 1fr;
       }
     }
   `]
 })
 export default class FaqComponent {
-  selectedCategory = 'Geral';
-
-  faqCategories: FaqCategory[] = [
+  faqs = [
     {
-      name: 'Geral',
-      icon: 'help_outline',
-      questions: [
-        {
-          question: 'Como funciona o período de teste?',
-          answer: 'Oferecemos 7 dias de teste gratuito em todos os planos. Durante este período, você terá acesso a todas as funcionalidades do plano escolhido, sem compromisso.'
-        },
-        {
-          question: 'Preciso instalar algum software?',
-          answer: 'Não, nossa plataforma é 100% baseada em nuvem. Você só precisa de um navegador e conexão com internet para acessar todas as funcionalidades.'
-        },
-        {
-          question: 'Posso cancelar a qualquer momento?',
-          answer: 'Sim, você pode cancelar sua assinatura a qualquer momento sem multa ou taxas adicionais. O serviço ficará disponível até o final do período pago.'
-        }
-      ]
+      question: 'Como funciona o período de teste?',
+      answer: 'Oferecemos 7 dias de teste grátis em todos os planos, sem necessidade de cartão de crédito. Durante este período, você terá acesso a todas as funcionalidades do plano escolhido.'
     },
     {
-      name: 'Funcionalidades',
-      icon: 'settings',
-      questions: [
-        {
-          question: 'Quais integrações estão disponíveis?',
-          answer: 'Oferecemos integração com os principais sistemas do mercado, incluindo QuickBooks, Projuris, Sienge e outros. A disponibilidade varia conforme o plano escolhido.'
-        },
-        {
-          question: 'Como funciona o suporte técnico?',
-          answer: 'O suporte técnico está disponível por email em todos os planos. Planos Professional e Enterprise contam com suporte via chat e telefone em horário comercial.'
-        },
-        {
-          question: 'É possível personalizar os relatórios?',
-          answer: 'Sim, todos os relatórios podem ser personalizados de acordo com suas necessidades. Nos planos Professional e Enterprise, você também pode criar modelos personalizados.'
-        }
-      ]
+      question: 'Preciso instalar algum software?',
+      answer: 'Não, nossa plataforma é 100% web-based. Você só precisa de um navegador moderno e conexão com a internet para acessar todas as ferramentas.'
     },
     {
-      name: 'Segurança',
-      icon: 'security',
-      questions: [
-        {
-          question: 'Como os dados são protegidos?',
-          answer: 'Utilizamos criptografia de ponta a ponta e seguimos as melhores práticas de segurança. Nossos servidores são certificados e realizamos backups diários.'
-        },
-        {
-          question: 'Onde os dados são armazenados?',
-          answer: 'Todos os dados são armazenados em servidores no Brasil, seguindo a LGPD e outras regulamentações de proteção de dados.'
-        },
-        {
-          question: 'Como funciona o backup dos dados?',
-          answer: 'Realizamos backups automáticos diários e mantemos múltiplas cópias em diferentes localizações para garantir a segurança dos seus dados.'
-        }
-      ]
+      question: 'Como funciona a cobrança?',
+      answer: 'A cobrança é feita mensalmente através de cartão de crédito ou boleto bancário. Nos planos anuais, oferecemos um desconto de 20% sobre o valor mensal.'
+    },
+    {
+      question: 'Posso cancelar a qualquer momento?',
+      answer: 'Sim, você pode cancelar sua assinatura a qualquer momento. Não há multa por cancelamento, e você continuará tendo acesso até o final do período pago.'
+    },
+    {
+      question: 'Como funciona o suporte técnico?',
+      answer: 'Oferecemos diferentes níveis de suporte de acordo com seu plano:<br>- Starter: Suporte por email em horário comercial<br>- Professional: Suporte por email e chat<br>- Enterprise: Suporte prioritário 24/7'
+    },
+    {
+      question: 'Os dados são seguros?',
+      answer: 'Sim, utilizamos criptografia de ponta a ponta e seguimos todas as normas de segurança e LGPD. Nossos servidores são redundantes e realizamos backups diários de todos os dados.'
     }
   ];
-
-  selectCategory(category: string) {
-    this.selectedCategory = category;
-  }
 }

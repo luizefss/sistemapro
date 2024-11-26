@@ -33,7 +33,8 @@
             ],
             "styles": [
             "node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
-              "src/styles.scss"
+              "src/styles.scss",
+            "keen-slider/keen-slider.min.css"
             ],
             "scripts": []
           },
@@ -94,7 +95,8 @@
             "styles": [
            
               "src/styles.scss",
-              "node_modules/@angular/material/prebuilt-themes/indigo-pink.css"
+              "node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+              "keen-slider/keen-slider.min.css"
             ],
             "scripts": []
           }

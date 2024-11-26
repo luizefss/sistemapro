@@ -13,7 +13,7 @@ import { HeaderComponent } from './components/shared/layout/header.component';
     FooterComponent
   ],
   template: `
-    <app-header></app-header>
+    <app-header />
    
     <main> <router-outlet></router-outlet></main>
 
