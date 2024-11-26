@@ -1,21 +1,27 @@
 import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { HeaderComponent } from './components/shared/layout/header.component';
+import { RouterOutlet } from '@angular/router';
 import { FooterComponent } from './components/shared/layout/footer.component';
-
+import { HeaderComponent } from './components/shared/layout/header.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [
-    RouterModule,
-    HeaderComponent,
-    FooterComponent
-  ],
+  imports: [RouterOutlet, HeaderComponent, FooterComponent],
   template: `
-    <app-header></app-header>
-    <router-outlet></router-outlet>
-    <app-footer></app-footer>
+    <app-header />
+    <main>
+      <router-outlet />
+    </main>
+    <app-integrations />
+        <app-support />
+    <app-footer />
+
   `,
+  styles: [`
+    main {
+      min-height: calc(100vh - 128px);
+      padding-top: 64px;
+    }
+  `]
 })
 export class AppComponent {}

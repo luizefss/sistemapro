@@ -1,9 +1,9 @@
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatToolbarModule } from '@angular/material/toolbar';
+import { Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { MatToolbarModule } from '@angular/material/toolbar';
 import { LoginComponent } from '../../auth/login.component';
 import { RegisterComponent } from '../../auth/register.component';
 
@@ -119,16 +119,15 @@ export class HeaderComponent {
     });
   }
 
-  openRegister() {
-    const dialogRef = this.dialog.open(RegisterComponent, {
-      width: '400px',
-      panelClass: 'register-dialog'
-    });
+openRegister() {
+  const dialogRef = this.dialog.open(RegisterComponent, {
+    width: '400px',
+    panelClass: 'register-dialog'
+  });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result === 'login') {
-        this.openLogin();
-      }   
-    });
-  }
-}
+  dialogRef.afterClosed().subscribe(result => {
+    if (result === 'login') {
+      this.openLogin();
+    }
+  });
+}}

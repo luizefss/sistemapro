@@ -1,86 +1,104 @@
+// home.component.ts
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
-import TestimonialsComponent from './testimonials.component';
+import ComparePlansComponent from './compare-plans/compare-plans.component';
+import FaqComponent from './faq/faq.component';
+import FeaturesComponent from './features/features.component';
+import IntegrationsComponent from './integrations/integrations.component';
+import PricingComponent from './pricing/pricing.component';
+import SupportComponent from './support/support.component';
+import TestimonialsComponent from './testimonials/testimonials.component';
+import UseCasesComponent from './use-cases/use-cases.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [
-    MatIconModule,
     CommonModule,
-    MatButtonModule,
     RouterModule,
-    TestimonialsComponent
+    MatButtonModule,
+    UseCasesComponent,
+    FeaturesComponent,
+    IntegrationsComponent,
+    PricingComponent,
+    ComparePlansComponent,
+    TestimonialsComponent,
+    SupportComponent,
+    FaqComponent
   ],
   template: `
-    <!-- Hero -->
+    <!-- Hero Section -->
     <section class="hero">
       <div class="container">
         <h1>Automatize seu Escritório</h1>
-        <p>Soluções para contabilidade, advocacia e engenharia</p>
-        <div class="cta-buttons">
+        <p>A plataforma completa para contabilidade, advocacia e engenharia</p>
+        <div class="stats">
+          <div class="stat">
+            <span class="stat-value">500+</span>
+            <span class="stat-label">Escritórios</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value">5k+</span>
+            <span class="stat-label">Documentos/dia</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value">98%</span>
+            <span class="stat-label">Satisfação</span>
+          </div>
+        </div>
+        <div class="hero-actions">
+          <a mat-raised-button color="primary" href="#compare-plans">
+            Conheça os Planos
+          </a>
+          <a mat-stroked-button color="accent" routerLink="/register">
+            Teste Grátis
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Casos de Uso por área -->
+    <app-use-cases />
+
+    <!-- Recursos/Ferramentas -->
+    <app-features />
+
+    <!-- Integrações -->
+    <app-integrations />
+
+    <!-- Preços -->
+    <app-pricing id="pricing" />
+
+    <!-- Comparativo Detalhado -->
+    <app-compare-plans id="compare-plans" />
+
+    <!-- Depoimentos -->
+    <app-testimonials />
+
+    <!-- Suporte -->
+    <app-support />
+
+    <!-- FAQ -->
+    <app-faq />
+
+    <!-- CTA Final -->
+    <section class="cta">
+      <div class="container">
+        <h2>Pronto para começar?</h2>
+        <p>Teste grátis por 7 dias, sem compromisso</p>
+        <div class="cta-actions">
           <a mat-raised-button color="primary" routerLink="/register">
             Começar Agora
           </a>
-          <a mat-raised-button color="accent" href="#plans">
-            Ver Planos
+          <a mat-stroked-button routerLink="/contato">
+            Falar com Consultor
           </a>
         </div>
       </div>
     </section>
-
-    <!-- Features -->
-    <section class="features">
-      <div class="container">
-        <h2>Recursos</h2>
-        <div class="features-grid">
-          @for(feature of features; track feature.title) {
-            <div class="feature-card">
-              <mat-icon>{{feature.icon}}</mat-icon>
-              <h3>{{feature.title}}</h3>
-              <p>{{feature.description}}</p>
-            </div>
-          }
-        </div>
-      </div>
-    </section>
-
-    <!-- Testimonials -->
-    <app-testimonials />
   `,
-  styles: [`
-    .hero {
-      background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
-      color: white;
-      padding: 120px 0;
-      text-align: center;
-    }
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 24px;
-    }
-  `]
+  styles: [/* ... estilos anteriores ... */]
 })
-export class HomeComponent {
-  features = [
-    {
-      icon: 'speed',
-      title: 'Automação',
-      description: 'Automatize tarefas repetitivas'
-    },
-    {
-      icon: 'security',
-      title: 'Segurança',
-      description: 'Seus dados protegidos'
-    }
-  ];
-}
+export default class HomeComponent {}

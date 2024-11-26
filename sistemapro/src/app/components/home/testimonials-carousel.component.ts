@@ -1,15 +1,14 @@
 // testimonials-carousel.component.ts
-
 import { CommonModule } from '@angular/common';
+import { Component, ElementRef, viewChild } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
-import { Component, OnInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
-import KeenSlider, { KeenSliderInstance } from 'keen-slider';
+import { KeenSliderInstance } from 'keen-slider';
 
 @Component({
   selector: 'app-testimonials-carousel',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatIconModule, KeenSlider, ElementRef,],
+  imports: [CommonModule, MatCardModule, MatIconModule],
   template: `
     <div class="testimonials">
       <h2>Depoimentos</h2>
@@ -21,12 +20,12 @@ import KeenSlider, { KeenSliderInstance } from 'keen-slider';
 })
 export default class TestimonialsCarouselComponent {
   private slider: KeenSliderInstance | null = null;
-  private readonly sliderRef = ViewChild('sliderRef');
+  private readonly sliderRef = viewChild<ElementRef>('sliderRef');
 
   constructor() {
     // Configuração do slider
     if (this.sliderRef) {
-      this.slider = new KeenSlider(this.sliderRef().nativeElement, {
+      this.slider = new KeenSliderInstance(this.sliderRef().nativeElement, {
         loop: true,
         slides: {
           perView: 1,
