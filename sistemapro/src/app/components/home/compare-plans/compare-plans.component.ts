@@ -68,7 +68,7 @@ interface PlanFeature {
              @for(feature of category.features; track feature.name) {
                <div class="feature-row">
                  <div class="feature-col">
-                   <span [matTooltip]="feature.tooltip || ''">
+                   <span [matTooltip]="feature.name || ''">
                      {{feature.name}}
                    </span>
                  </div>
