@@ -8,7 +8,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
-import SolutionDetailsModalComponent from './solution-details-modal/solutuion-details-modal.component';
+import SolutionDetailsModalComponent from './solution-details-modal/solution-details-modal.component';
 
 interface Solution {
   area: string;
