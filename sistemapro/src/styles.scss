@@ -10,9 +10,31 @@
 // Usar @use em vez de @import
 @import 'keen-slider/keen-slider.min.css';
 
+.solution-details-modal {
+    .mdc-dialog__surface {
+        border-radius: 16px;
+    }
 
+    .mdc-dialog__container {
+        padding: 0;
+    }
+}
+
+.solution-modal {
+    .mdc-dialog__surface {
+        border-radius: 15px;
+    }
+
+    .mdc-dialog__container {
+        padding: 0;
+    }
+}
 // Definição das paletas de cores
-
+.solution-details-modal {
+    .mat-mdc-dialog-container {
+        padding: 0;
+    }
+}
 
 // Definição do tema
 .cdk-overlay-container {
@@ -20,7 +42,7 @@
 }
 
 .cdk-overlay-backdrop {
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: rgba(97, 93, 93, 0.6);
     /* Ajuste a opacidade conforme necessário */
 }
 

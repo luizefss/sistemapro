@@ -12,10 +12,10 @@ import TestimonialsComponent from "./testimonials/testimonials.component";
   selector: 'app-home',
   standalone: true,
   imports: [
+    SolutionsComponent,
     CommonModule,
     RouterModule,
     MatButtonModule,
-    SolutionsComponent, // Substituindo AutomationToolsComponent
     FeaturesComponent,
     PricingComponent,
     TestimonialsComponent,
