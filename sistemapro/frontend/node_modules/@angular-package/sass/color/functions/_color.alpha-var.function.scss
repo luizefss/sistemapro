@@ -1,0 +1,73 @@
+// Sass.
+@use 'sass:map';
+
+// Variables.
+@use '../../variables';
+
+// Modules.
+@use '../../var';
+@use '../name';
+
+// Functions.
+@use 'color.name.function' as *;
+
+// Status: DONE
+// The `color.alpha-var()` function returns color name of CSS variable alpha.
+// @param `$name` Color name of `string` or `list` type.
+// @param `$adjust` Adjustment for alpha value.
+// @param `$fallback` Fallback value of returned alpha variable.
+// @param `$dictionary` Dictionary for `$name` translation.
+// @param `$delimiter` Separator between each element in name of returned CSS variable.
+// @param `$prefix` Prefix in `$name`. By default, it uses `prefix` of `$var` sass variable.
+// @param `$suffix` Suffix in `$name`. By default, it uses `suffix` of `$var` sass variable.
+// @param `$shade` Shade of color, by default dark or light.
+// @param `$color` Retrieved color from `$name`.
+// @returns The returned value is CSS variable that indicates alpha of color.
+@function alpha-var(
+  $name,
+  $adjust: null,
+  $fallback: null,
+  $dictionary: (),
+  $delimiter: null,
+  $prefix: null,
+  $suffix: null,
+  $shade: (dark, light),
+  $color: name.retrieve($name),
+) {
+  @return var.get(
+    name(map.get($color, name), alpha, $delimiter, $shade: $shade),
+    name.adjustment-calculate(map.get($color, alpha), $adjust, 0),
+    null,
+    $fallback,
+    $dictionary,
+    map.get($dictionary, map.get(variables.$name-configuration, delimiter)) or $delimiter,
+    $prefix,
+    $suffix,
+  );
+}
+
+// Examples.
+// $-delimiter: '-';
+
+// @debug alpha-var(primary); // var(--s-primary-color-alpha)
+
+// delimiter in dictionary
+// @debug alpha-var(primary-dark, $dictionary: (delimiter: '-')); // var(--s-primary-color-dark-alpha)
+
+// adjusted
+// @debug alpha-var(primary, 0.1); // calc(var(--s-primary-color-alpha) + 0.1)
+// @debug alpha-var(primary, -0.1); // calc(var(--s-primary-color-alpha) + -0.1)
+// @debug alpha-var(primary, '+' 0.9); // calc(var(--s-primary-color-alpha) + 0.9)
+// @debug alpha-var(primary, '-' 0.9); // calc(var(--s-primary-color-alpha) - 0.9)
+
+// adjusted + fallback
+// @debug alpha-var(primary, 0.1, 0.5); // calc(var(--s-primary-color-alpha, 0.5) + 0.1)
+// @debug alpha-var(primary, 0.9, 0.5); // calc(var(--s-primary-color-alpha, 0.5) + 0.9)
+// @debug alpha-var(primary (adjust: 0.9, fallback: 0.5)); // calc(var(--s-primary-color-alpha, 0.5) + 0.9)
+
+// adjusted + fallback + dictionary
+// @debug alpha-var(primary, 0.9, 0.5, (primary: p)); // calc(var(--s-p-color-alpha, 0.5) + 0.9)
+// @debug alpha-var(primary, 0.9, 0.5, (primary: spectre, suffix: basic)); // calc(var(--spectre-primary-color-alpha-basic, 0.5) + 0.9)
+
+// adjustment in name
+// @debug alpha-var((primary-dark, 15%, -0.2), '-' 0.9, $delimiter: $-delimiter); // calc(var(--primary-color-dark-alpha) - 0.7)

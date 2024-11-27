@@ -1,0 +1,111 @@
+// Sass.
+@use 'sass:list';
+@use 'sass:meta';
+
+// Functions.
+@use '../../selector/selector.class.function' as *;
+
+// Mixins.
+@use '../../list/list.each.mixin' as *;
+
+// Modules.
+@use '../../values';
+
+// Status: REVIEW:
+// The `variant.combine()` mixin.
+// @param `$variant`
+// @param `$pseudo-class`
+// @param `$dictionary`
+@mixin combine(
+  $variant,
+  $pseudo-class: (),
+  $dictionary: (),
+  $function: meta.get-function(class)
+) {
+  @if type-of($variant) == map {
+    @each $class, $attribute-value in $variant {
+      $-class: ();
+      @if type-of($attribute-value) == map {
+        @each $attribute, $value in $attribute-value {
+          @if type-of($value) == map {
+            @each $value-class, $value in $value {
+              $-class: ();
+              $-value-class: ();
+              @include each($class) using($class) {
+                @include each($attribute) using($attribute) {
+                  $-value-class: $value-class;
+                  @include each($value-class) using($value-class) {
+                    $-class: list.append(
+                      $-class,
+                      meta.call(
+                        $function,
+                        values.join(
+                          if(&, '&', ()),
+                          $class,
+                          $attribute,
+                          $value-class
+                        ),
+                        $pseudo-class,
+                        $dictionary
+                      ),
+                      $separator: comma
+                    );
+                  }
+                }
+              }
+              #{$-class} {
+                @content($class, $attribute, $-value-class, $value);
+              }
+            }
+          } @else {
+            @each $value in $value {
+              $-class: ();
+              @include each($class) using($class) {
+                @include each($attribute) using($attribute) {
+                  $-class: list.append(
+                    $-class, meta.call(
+                      $function,
+                      values.join(
+                        if(&, '&', ()),
+                        $class,
+                        $attribute
+                      ),
+                      $pseudo-class,
+                      $dictionary
+                    ),
+                    $separator: comma
+                  );
+                }
+              }
+            }
+            #{$-class} {
+              @content($class, $attribute, $value);
+            }
+          }
+        }
+      } @else {
+        @include each($attribute-value, false) using($value) {
+          $-class: ();
+          @include each($class) using($class) {
+            $-class: list.append(
+              $-class,
+              meta.call(
+                $function,
+                values.join(
+                  if(&, '&', ()),
+                  $class
+                ),
+                $pseudo-class,
+                $dictionary
+              ),
+              $separator: comma
+            );
+          }
+        }
+        #{$-class} {
+          @content($class, $attribute-value);
+        }
+      }
+    }
+  }
+}

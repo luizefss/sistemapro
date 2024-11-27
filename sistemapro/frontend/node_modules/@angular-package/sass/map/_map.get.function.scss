@@ -1,0 +1,47 @@
+// Sass.
+@use 'sass:list';
+@use 'sass:map';
+@use 'sass:meta';
+
+// Status: TODO: Do not check map and key.
+// The modified `map.get()` function returns the value associated with `$key` in `$map`, and returns `$fallback` if returned is `null`.
+// ? Modified by removing arbitrary argument `$keys...` and instead, adding `$fallback` value. To get the nested value use key as comma-separated list.
+// ? This way of providing key as comma-separated list is consistent with `map.remove()` and `map.set()` functions.
+// @param `$map` A map to get the value by using `$key`.
+// @param `$key` The key used to get the value from `$map`.
+// @param `$fallback` The fallback value if returned is `null`.
+// @return The return value is the value associated with `$key` from the `$map`, if `null` returns `$fallback`.
+@function get($map, $key, $fallback: null) {
+  $result: if(
+    meta.type-of($map) == map and list.length($key) > 0,
+    if(list.separator($key) == comma, map.get($map, $key...), map.get($map, $key)),
+    $fallback
+  );
+  @return if($result == null, $fallback, $result);
+}
+
+// Examples.
+// $-map: (
+//   light theme: (
+//     primary palette: (
+//       primary: primary color,
+//       primary dark: primary color dark
+//     )
+//   ),
+//   (dark theme, normal theme): (
+//     silver: #f1f1f1,
+//     red: #d72000,
+//   )
+// );
+
+// simple key
+// @debug get($-map, light theme); // (primary palette: (primary: primary color, primary dark: primary color dark))
+
+// nested key
+// @debug get($-map, (light theme, primary palette)); // (primary: primary color, primary dark: primary color dark)
+
+// null
+// @debug get($-map, wrong key); // null
+
+// fallback
+// @debug get($-map, wrong key, (must be: this value)); // (must be: this value)

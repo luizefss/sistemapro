@@ -1,0 +1,14 @@
+// Functions.
+@use 'object.get.function' as *;
+
+// Modules.
+@use '../map';
+
+// Status: TODO: pick from different objects
+// The `object.pick()` function picks keys from object in use.
+// @param `$key` A required key from which value is picked.
+// @arbitrary `$keys...` Additional keys to pick values.
+// @returns The returned value is object of `$key`, optionally `$keys`.
+@function pick($key, $keys...) {
+  @return map.pick(get(), $key, $keys...);
+}

@@ -1,0 +1,231 @@
+// Sass.
+@use 'sass:list';
+@use 'sass:map';
+
+// Modules.
+@use '../../function';
+@use '../../meta';
+@use '../../values';
+@use '../../variant';
+@use '../name';
+@use 'color';
+@use 'schema';
+
+// Functions.
+@use '../../list/get/get.list.function' as list-get-list;
+@use '../../list/list.append.function' as list-append;
+@use '../../list/list.range.function' as list-range;
+@use '../../list/remove/remove.nth.function' as list-remove-nth;
+@use '../../map/map.key-replace.function' as map-key-replace;
+
+// Module functions.
+@use '../functions/color.name.function' as *;
+@use 'variant/variant.create.function' as variant-create;
+
+// Add.
+function.$functions: map.set(function.$functions, color, name, meta.get-function(name));
+
+// Status: REVIEW: Simplify code.
+// The `palette.create()` function.
+// @arbitrary `$palettes...`
+// @returns
+@function create($palettes...) {
+  // FEATURE: Prepare additional colors.
+  $additional-colors: ();
+
+  // Iterate `$palettes`.
+  $i: 1;
+  @each $palette in $palettes {
+    // Palette must be map type (name: schema).
+    @if type-of($palette) == map {
+      // Iterate palette.
+      @each $palette-name, $colors in $palette {
+        // To create color palette need schema list type not variant.
+        @if not (type-of($colors) == map) {
+          // Nested variant.
+          $nested-variant: variant.indicator-index($palette-name, '+');
+
+          // Variant colors to add after iterate.
+          $variant-colors: ();
+
+          // Iterate colors to obtain variant colors.
+          @each $color in $colors {
+            // Get nested colors indicator index.
+            $nested-colors-index: variant.indicator-index($color, '+');
+
+            // FEATURE: Nested colors.
+            @if $nested-colors-index {
+              $j: 1;
+              @each $nested-color in $color {
+                @if type-of($nested-color) == list {
+                  $name: variant.indicator-remove(list-range.range($color, 1, $j - 1), '+');
+                  $k: 1;
+                  @each $part-color in $nested-color {
+                    // FEATURE: Get additional/multiple colors in nested colors.
+                    @if schema.has-multiple-colors($part-color) {
+                      // Retrieve variant color.
+                      $variant-color: name.retrieve(list.nth($part-color, 1), name);
+
+                      // If variant nested.
+                      @if $nested-variant {
+                        // REVIEW: Check `name.nest()`
+                        $variant-color: list.nth(name.nest(variant.indicator-remove($palette-name, '+'), $name, $variant-color), 1);
+                      } @else {
+                        $variant-color: list.nth(name.nest($name, $variant-color), 1);
+                      }
+
+                      // Add additional colors from range `2`.
+                      $additional-colors: map.deep-merge(
+                        $additional-colors,
+                        (
+                          variant.indicator-remove($palette-name, '+'): (
+                            name.indicator-remove($variant-color, ':'): list-range.range($part-color, 2)
+                          )
+                        )
+                      );
+                      $nested-color: list.set-nth($nested-color, $k, list.nth($part-color, 1));
+                    }
+
+                    $k: $k + 1;
+                  }
+
+                  $color: list.set-nth($color, $j, $nested-color);
+                }
+
+                $j: $j + 1;
+              }
+
+              $variant-colors: values.join(
+                (separator: comma),
+                $variant-colors,
+                name.nest(variant.indicator-remove($color, '+')...)
+              );
+            }
+
+            // FEATURE: Get additional/multiple colors.
+            @else if schema.has-multiple-colors($color) {
+              // Retrieve variant color.
+              $variant-color: name.retrieve(list.nth($color, 1), name);
+
+              // Add additional colors from range `2`.
+              $additional-colors: map.deep-merge(
+                $additional-colors,
+                (variant.indicator-remove($palette-name, '+'): ($variant-color: list-range.range($color, 2)))
+              );
+
+              // Append color to variant colors.
+              $variant-colors: list-append.append($variant-colors, list.nth($color, 1), comma);
+            } @else {
+              $variant-colors: list-append.append($variant-colors, $color, comma);
+            }
+          }
+
+          $palette: map.deep-merge($palette, ($palette-name: $variant-colors));
+        }
+
+      }
+
+      $palettes: list.set-nth($palettes, $i, $palette);
+      $i: $i + 1;
+    }
+  }
+
+  // Nest values.
+  $palettes: variant.nest($palettes...);
+
+  // FEATURE: Create variant from list.
+  $palettes: variant-create.create($palettes);
+
+  // FEATURE: Add indicator.
+  @each $name, $variant in $palettes {
+    @each $class, $color in $variant {
+      $palettes: map.deep-merge($palettes, ($name: ($class: name.indicator-add($color))));
+    }
+  }
+
+  // FEATURE: Add additional colors to variant.
+  @if list.length($additional-colors) > 0 {
+    @each $name, $variant in $additional-colors {
+      @each $name in if(list.separator($name) == space, ($name,), $name) {
+        @each $class, $colors in $variant {
+          $palettes: color.add($palettes, $name, $class, space, $colors...);
+        }
+      }
+    }
+  }
+
+  // FEATURE: Remove property indicator ':' + assign.
+  @each $name, $variant in $palettes {
+    @each $class, $colors in $variant {
+      @if schema.has-multiple-colors($colors) {
+        $i: 1;
+        @each $color in $colors {
+          @if list.length($color) > 0 {
+            $property-name: name.retrieve($color, property-name);
+            @if $property-name {
+              $colors: list.set-nth($colors, $i, $property-name);
+            }
+          }
+
+          $i: $i + 1;
+        }
+
+        $variant: map.set($variant, $class, $colors);
+      } @else {
+        $property-name: name.retrieve($colors, property-name);
+        @if $property-name {
+          $variant: map.set($variant, $class, ($property-name,));
+        }
+      }
+    }
+
+    $palettes: map.set($palettes, $name, $variant);
+  }
+  @return $palettes;
+}
+
+// Examples.
+// Structure
+// (palette-name: (color 1, nested-colors, color 2))
+
+// Nested colors
+// (palette-name: (color 1, +color prefix (color suffix 1, color suffix 2, color suffix 3), color 2))
+
+// Multiple colors
+// (palette-name: (color 1, +color prefix (color suffix 1, (color suffix 2) (additional color 1) (), color suffix 3), color 2))
+
+// Nested variant multiple colors
+// (+palette-name: (color 1, +color prefix (color suffix 1, (color suffix 2) (additional color 1) (), color suffix 3), color 2))
+
+// Multiple nested variants and multiple colors
+// ((+palette-name-1, +palette-name-2): (color 1, +color prefix (color suffix 1, (color suffix 2) (additional color 1) (), color suffix 3), color 2))
+
+
+// default variant.
+// @debug create((primary: (primary: primary color, primary dark: primary color dark)));
+
+//
+// @debug create((control: (disabled, error, warning))); // (control: (disabled color: disabled color, error color: error color, warning color: warning color))
+
+//
+// @debug create((control: (disabled, error, warning), core: (primary, secondary))); // (control: (disabled: disabled color, error: error color, warning: warning color), core: (primary: primary color, secondary: secondary color))
+
+//
+// @debug create((+control: (disabled, error, warning), +primary: (basic color, extended dark, minimum light))); // (control: (control disabled: control disabled color, control error: control error color, control warning: control warning color), primary: (primary basic color: primary basic color, primary extended dark: primary extended color dark, primary minimum light: primary minimum color light))
+// @debug create(((+primary, +secondary): (color, dark, light))); // (primary: (primary color: primary color, primary dark: primary color dark, primary light: primary color light), secondary: (secondary color: secondary color, secondary dark: secondary color dark, secondary light: secondary color light))
+
+//
+// @debug create((+primary: (color, ((basic dark) 3% 0.5), dark, light)));
+
+//
+// @debug create(((+accent, primary): (color, ((basic dark) 3% 0.5) (light, 10%) (dark, 5%) (), light, dark)));
+
+// Multiple colors
+// @debug create(((+accent, primary): (color, ((basic dark) 3% 0.5) (light, 10%) (dark, 5%) (), light, dark)));
+
+// @debug create((
+//   // +core: (color, +primary test (color, dark, light), (primary dark, 15%) (primary light, 5%) (), error, ),
+//   // +core: (color, (primary dark, 15%) (primary light, 5%) (), error, ),
+
+//   (+core a, test b): (+primary style ((color a, 5%), (dark b, 1%) (else c, 2%) (), (light d, 2%),),),
+// ));

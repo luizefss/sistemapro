@@ -1,0 +1,100 @@
+// Sass.
+@use 'sass:list';
+
+// Variables.
+@use 'property.variables' as variables;
+
+// Functions.
+@use 'property.set.mixin';
+
+// Modules.
+@use '../class';
+@use '../map';
+@use '../meta';
+@use '../selector';
+@use '../values';
+
+// Status: DONE @deprecated
+// INFO: Mixin name will be the same as `property.class-variant()`.
+// Property `property.variant()` mixin sets property variant.
+// @param `$variant` Property variant of `map` type to set. (See examples for map structure)
+// @param `$important` Indicates property is `important`.
+// @param `$pseudo-class` Pseudo class for class selector in `$variant`.
+// @param `$dictionary` Dictionary to translate class selector and passed as (dictionary arguments) for called functions.
+// @param `$class-function` Function to set class selector.
+// @param `$prefix` Prefix(es) of the function name defined in value and/or `$type-function` that are used to call them on types in value.
+// @param `$separator` Separator(s) of the function name defined in value and/or `$type-function`.
+// @param `$type-function` A map of (type: function) to determine which types are to be invoked in property value.
+// @param `$functions` Functions instead of global that can be called on property values.
+// @param `$execute` Whether to execute `property.set()` function.
+// // @param `$arguments` Additional arguments of `list` or `map` type to pass into called functions.
+@mixin variant(
+  // class, property
+  $variant: (),
+  $important: null,
+  // class
+  $pseudo-class: (),
+  // class, value
+  $dictionary: null,
+  // class
+  $class-function: meta.get-function(class, false, selector),
+  // function
+  $prefix: null,
+  $separator: null,
+  $type-function: null,
+  $functions:null,
+  $execute: true,
+  $modifier: null
+) {
+  @warn "Mixin @deprecated, use `property.class-variant()` with 1 - 4 deep-variant instead.";
+  @if type-of($variant) == map {
+    $type-function: if($type-function, $type-function, variables.$type-function);
+    @include class.variant($variant, $pseudo-class, $dictionary, $class-function, map, $modifier) using($resolved) {
+      @if type-of(map.get($resolved, value)) == map {
+        @each $attribute, $value in map.get($resolved, value) {
+          $name: map.get($resolved, property);
+
+          // FIX
+          @if not $modifier {
+            $name: values.combine(
+              (method: space),
+              map.get($resolved, property),
+              map.get($resolved, attribute),
+              $attribute
+            );
+          }
+          @include property.set(
+            ($name: $value),
+            $important,
+            $prefix,
+            $separator,
+            $type-function,
+            $functions,
+            $execute,
+            (dictionary: $dictionary)
+          );
+        }
+      } @else {
+        $name: map.get($resolved, property);
+
+        // FIX: Done.
+        @if not $modifier and map.get($resolved, attribute) {
+          $name: values.combine(
+            map.get($resolved, property),
+            map.get($resolved, attribute)
+          );
+        }
+        @include property.set(
+          ($name: map.get($resolved, value)),
+          $important,
+          $prefix,
+          $separator,
+          $type-function,
+          $functions,
+          $execute,
+          (dictionary: $dictionary)
+        );
+      }
+    }
+  }
+}

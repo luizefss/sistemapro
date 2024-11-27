@@ -1,0 +1,32 @@
+// Sass.
+@use 'sass:list';
+
+// Modules.
+@use '../../values';
+
+// Modules functions.
+@use '../../list/remove/remove.value.function' as list-remove-value;
+
+// Status: TODO:
+// The `class.name()` function.
+// @param `$names`
+// @returns
+@function name($names...) {
+  $class: ();
+  $names: list-remove-value.value($names, ());
+  @each $name in $names {
+    @if list.separator($name) == comma {
+      $class: values.combine((join: $class), $name);
+    } @else {
+      $class: values.join($class, $name);
+    }
+  }
+  @return $class;
+}
+
+// Examples.
+// @debug name(border); // border
+// @debug name(border color); // border color
+// @debug name((border, outline)); // (border, outline)
+// @debug name((border, outline), (top, bottom), color); // (border, outline) (top, bottom) color
+// @debug name((border, outline) top, (color, radius)); // (border, outline) top (color, radius)

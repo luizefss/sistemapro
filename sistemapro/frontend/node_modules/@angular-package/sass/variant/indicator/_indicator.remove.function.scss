@@ -1,0 +1,55 @@
+// Sass.
+@use 'sass:list';
+@use 'sass:string' as string-slice;
+
+// Modules.
+@use '../../string/string.index.function' as string-index;
+@use '../../string/string.replace.function' as string-replace;
+
+// Functions.
+@use 'indicator.index.function' as *;
+
+// Status: TODO:
+// The `indicator.remove()` function.
+// @param `$item`
+// @param `$indicator`
+// @returns
+@function remove($item, $indicator) {
+  @if type-of($item) == string {
+    @if string-index.index($item, $indicator) {
+      $item: string-slice.slice($item, 2);
+    }
+  } @else{
+    @for $i from 1 through list.length($item) {
+      @if type-of(list.nth($item, $i)) == string {
+        $item: list.set-nth($item, $i, string-replace.replace(#{list.nth($item, $i)}, all, $indicator, ''));
+      } @else if type-of(list.nth($item, $i)) == list {
+        $list: list.nth($item, $i);
+        @for $j from 1 through list.length($list) {
+          @if string-index.index(list.nth($list, $j), $indicator) {
+            $list: list.set-nth($list, $j, string-replace.replace(#{list.nth($list, $j)}, all, $indicator, ''));
+          }
+
+          $j: $j + 1;
+        }
+
+        $item: list.set-nth($item, $i, $list);
+      }
+    }
+  }
+  @return $item;
+}
+
+
+
+// Examples.
+// @debug remove(+background, '+'); // background
+// @debug remove(+bg, '+'); // bg
+// @debug type-of(remove(+bg, '+')); // string
+
+// Palette name
+// @debug remove((+background, border), '+'); // background, border
+
+// Nested colors.
+// @debug remove(+background basic (color, (light, 1%), (dark, 4%)), '+'); // background basic (color, (light, 1%), (dark, 4%))
+// @debug remove(+background basic (+color, (light, 1%), (dark, 4%)), '+'); // background basic (color, (light, 1%), (dark, 4%))

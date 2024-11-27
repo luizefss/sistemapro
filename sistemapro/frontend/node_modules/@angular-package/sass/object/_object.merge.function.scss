@@ -1,0 +1,36 @@
+// Sass.
+@use 'sass:list';
+@use 'sass:meta';
+
+// Variable.
+@use 'object.var' as object;
+
+// Modules.
+@use '../map';
+
+// Functions.
+@use 'object.get.function' as *;
+@use 'object.last-name.function' as *;
+
+// Status: DONE
+// The `object.merge()` function merges `$objects` into object in use, optionally under `$key`.
+// @param `$key` A key under which `$objects` are merged.
+// @arbitrary `$objects...` Objects to merge into object in use.
+// @returns The returned value is object in use with merged `$objects`.
+@function merge($key: null, $objects...) {
+  $name: object.$name or last-name();
+  $retrieved-object: ();
+  @each $object in $objects {
+    $retrieved-object: map.deep-merge(
+      $retrieved-object,
+      if(meta.type-of($object) == list, map.pick(list.nth($object, 1), list.nth($object, 2)...), $object)
+    );
+  }
+
+  object.$object: if(
+    $key,
+    map.merge(object.$object, $name, $key, $retrieved-object),
+    map.deep-merge(object.$object, ($name: $retrieved-object))
+  );
+  @return get();
+}

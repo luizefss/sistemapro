@@ -1,0 +1,65 @@
+// Sass.
+@use 'sass:list';
+@use 'sass:map';
+
+// Modules.
+@use '../../meta';
+
+// Functions.
+@use '../../class/variant/variant.create.mixin' as class-variant-create;
+@use '../../map/map.get.function' as map-get;
+@use '../../selector/selector.class.function';
+
+// Mixins.
+@use '../mixins/color.color.mixin' as *;
+
+// Status: TODO:
+// The `color.variant-create()` mixin.
+// @param `$variant`
+// @param `$combine`
+// @param `$hue`
+// @param `$saturation`
+// @param `$lightness`
+// @param `$alpha`
+// @param `$important`
+// @param `$pseudo-class`
+// @param `$dictionary`
+// @param `$function`
+// @param `$modifier`
+@mixin create(
+  $variant,
+  $combine: false,
+  $hue: null,
+  $saturation: null,
+  $lightness: null,
+  $alpha: null,
+  $important: false,
+  $pseudo-class: (),
+  $dictionary: (),
+  $function: meta.get-function(class, false, selector),
+  $modifier: null,
+) {
+  @warn "In previous version `$modifier` is equal to (class: (prop-attribute: color), property: (prop-attribute: color))";
+  @include class-variant-create.create(
+    $variant,
+    $combine,
+    $pseudo-class,
+    $dictionary,
+    $function,
+    $modifier,
+  ) using($resolved) {
+    @each $property in if(type-of(map.get($resolved, property)) == map, (map.get($resolved, property),), map.get($resolved, property)) {
+      @include color(
+        (map.get($property, name): map.get($property, value)),
+        $hue,
+        $saturation,
+        $lightness,
+        $alpha,
+        null,
+        $important,
+        $dictionary: $dictionary,
+      );
+    }
+    @content($resolved);
+  }
+}

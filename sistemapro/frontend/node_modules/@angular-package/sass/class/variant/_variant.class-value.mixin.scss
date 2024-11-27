@@ -1,0 +1,83 @@
+// Sass.
+@use 'sass:list';
+@use 'sass:meta';
+
+// Functions.
+@use '../../list/list.to-map.function' as *;
+@use '../../map/map.get.function';
+@use '../../selector/selector.class.function' as *;
+@use '../../variant/update/update.property.function';
+
+// Mixins.
+@use '../../list/list.each.mixin' as *;
+@use '../class.content.mixin' as class;
+
+// Modules.
+@use '../../values';
+
+// Status: DONE
+// The `variant.class-value()` mixin.
+// @param `$variant`
+// @param `$pseudo-class`
+// @param `$dictionary`
+// @param `$function`
+// @param `$content-type`
+// @param `$modifier`
+@mixin class-value(
+  $variant,
+  $pseudo-class: (),
+  $dictionary: null,
+  $function: meta.get-function(class),
+  $content-type: list,
+  $modifier: null,
+) {
+  @if type-of($variant) == map {
+    @each $class, $value in $variant {
+      $property: null;
+      @if type-of($class) == map {
+        @each $-class, $-property in $class {
+          $class: $-class;
+          $property: $-property;
+        }
+      }
+
+      // FEATURE: Works fine.
+      @include each($value) using($value) {
+        @include each($class) using($class) {
+          @include class.content(
+            values.join(
+              if(&, '&', ()),
+              map.get($modifier, (class, prefix), null),
+              $class,
+              map.get($modifier, (class, attribute), null),
+              map.get($modifier, (class, suffix), null),
+            ),
+            $pseudo-class,
+            $dictionary,
+            $function,
+          ) {
+            // Set property.
+            $-property: $property or $class;
+            @if $modifier {
+              $-property: update.property($-property, $modifier);
+            }
+
+            // Set `$arguments` for `@content`.
+            $arguments: if(
+              $content-type == map,
+              to-map(($class, $-property, $value), (class, property, value)...),
+              values.combine((separator: comma), $class, $-property, $value)
+            );
+
+            // Pass `$arguments` into `@content()`.
+            @if type-of($arguments) == list {
+              @content($arguments...);
+            } @else {
+              @content($arguments);
+            }
+          }
+        }
+      }
+    }
+  }
+}

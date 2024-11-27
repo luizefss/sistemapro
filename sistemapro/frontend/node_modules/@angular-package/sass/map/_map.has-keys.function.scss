@@ -1,0 +1,41 @@
+// Sass.
+@use 'sass:list';
+@use 'sass:map';
+
+// Functions.
+@use '../list/list.append.function' as *;
+
+// Status: DONE
+// The `map.has-keys()` function checks whether `$map` contains `$keys`.
+// @param `$map` A map to check whether it has all `$keys`.
+// @param `$key` Required key to check whether `$map` contains.
+// @param `$keys...` Additional keys to check whether `$map` contains them.
+// @return The return value is a `bool` indicating `$map` contains `$key` or/and `$keys`.
+@function has-keys($map, $key, $keys...) {
+  $has: ();
+  @each $key in append((), $key, comma, $keys...) {
+    $has: list.append($has, if(list.separator($key) == comma, map.has-key($map, $key...), map.has-key($map, $key)));
+  }
+  @return if(list.index($has, false), false, true);
+}
+
+// Examples.
+// $-map: (list1: (), list2: (), a b c d e f: value, a: (b: (c: (d: e))), any: true, all: false, separator: auto, bracketed: false, method: join, null: false);
+
+// string key
+// @debug has-keys($-map, list1, list2); // true
+
+// string keys
+// @debug has-keys($-map, list1, list2); // true
+// @debug has-keys($-map, list1, list2, wrong); // false
+// @debug has-keys($-map, list1, list3); // false
+
+// list key
+// @debug has-keys($-map, a b c d e f); // true
+// @debug has-keys($-map, a b c d e); // false
+// @debug has-keys($-map, a b c d e f, bracketed); // true
+// @debug has-keys($-map, a b c d e, bracketed); // false
+
+// nested keys
+// @debug has-keys($-map, (a, b, c, d), a b c d e f); // true
+// @debug has-keys($-map, (a, b, c, d), (a b c d e f g)); // false

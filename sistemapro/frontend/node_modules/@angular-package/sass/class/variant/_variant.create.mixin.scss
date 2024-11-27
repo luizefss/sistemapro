@@ -1,0 +1,40 @@
+// Modules.
+@use '../../meta';
+
+// Mixins.
+@use '../../class/class.content.mixin';
+@use '../../variant/variant.transform.mixin';
+
+// Functions.
+@use '../../map/map.get.function';
+@use '../../selector/selector.class.function';
+
+// Status: DONE
+// The `class.variant-create()` mixin.
+// @param `$variant`
+// @param `$combine`
+// @param `$pseudo-class`
+// @param `$dictionary`
+// @param `$function`
+// @param `$modifier`
+@mixin create(
+  $variant,
+  $combine: false false false false,
+  $pseudo-class: (),
+  $dictionary: (),
+  $function: meta.get-function(class, false, selector),
+  $modifier: null,
+) {
+  @include variant.transform($variant, $combine, $modifier) using($resolved) {
+    @each $resolved in $resolved {
+      @include class.content(
+        join(if(&, '&', ()), map.get($resolved, (class, name))),
+        $pseudo-class,
+        $dictionary,
+        $function,
+      ) {
+        @content($resolved);
+      }
+    }
+  }
+}

@@ -1,0 +1,396 @@
+// Sass.
+@use 'sass:list';
+
+// Modules.
+@use '../meta';
+
+// Local modules.
+@use 'class';
+@use 'indicator';
+@use 'modifier';
+@use 'property';
+
+// Functions.
+@use '../function/call/call.arglist.function' as function-call-arglist;
+@use '../function/function.has.function' as function-has;
+@use '../list/list.append.function' as list-append;
+@use '../map/map.get.function' as map-get;
+@use '../map/map.set.function' as map-set;
+@use '../property/property.name.function' as property-name;
+@use '../string/string.index.function' as string-index;
+
+// Mixins.
+@use 'variant.class-property.mixin' as *;
+
+// Module functions.
+@use 'variant.append.function' as *;
+@use 'variant.combine-get.function' as *;
+
+// Status: TODO:
+// Category: Property variant.
+// The `variant.transform()` mixin transforms variant from level 1 - 4 to map and append to rows.
+// @param `$variant` A `map` type value to append into list row as prepared `map`.
+// @param `$combine` A `list`, `map`, or `bool` value to indicate whether all or selected level is combined variant.
+// @param `$modifier`
+@mixin transform($variant, $combine: false, $modifier: null) {
+  $rows: ();
+  @each $class-property, $middle_attribute_variant in $variant {
+    // FEATURE: Call function.
+    $class-property: if(
+      meta.type-of($class-property) == list and list.length($class-property) > 1 and function-has.has($class-property),
+      function-call-arglist.arglist($class-property...),
+      $class-property
+    );
+
+    $middle_attribute_variant: if(
+      meta.type-of($middle_attribute_variant) == list and list.length($middle_attribute_variant) > 1 and function-has.has($middle_attribute_variant),
+      function-call-arglist.arglist($middle_attribute_variant...),
+      $middle_attribute_variant
+    );
+
+    // End: Call function.
+
+    // FEATURE: + Check Indicator.
+    @if meta.of-type(list string, $class-property) and indicator.index($class-property, '+') {
+      $-property-name: ();
+      @each $value in $class-property {
+        @if indicator.index($value, '+') {
+          $-property-name: list-append.append($-property-name, indicator.remove($value, '+'));
+        }
+      }
+
+      $class-property: property-name.name(indicator.remove($class-property, '+'));
+      $class-property: ($class-property: $-property-name,);
+    }
+
+    // End: Check indicator.
+    @include class-property($class-property, combine-get($combine, 1)) using($class_property, $property-name) {
+      $property: (base: $property-name or $class_property);
+      @if type-of($middle_attribute_variant) == map {
+        // FEATURE: Variant 2
+        @each $middle, $attribute-variant in $middle_attribute_variant {
+          // FEATURE: Call function.
+          $middle: if(
+            meta.type-of($middle) == list and list.length($middle) > 1 and function-has.has($middle),
+            function-has.call-arglist($middle...),
+            $middle
+          );
+          $attribute-variant: if(
+            meta.type-of($attribute-variant) == list and list.length($attribute-variant) > 1 and function-has.has($attribute-variant),
+            function-call-arglist.arglist($attribute-variant...),
+            $attribute-variant
+          );
+
+          // End: Call function.
+          // FEATURE: + Check Indicator.
+          @if meta.of-type(list string, $middle) and indicator.index($middle, '+') {
+            $-property-name: ();
+            @each $value in $middle {
+              @if indicator.index($value, '+') {
+                $-property-name: list-append.append($-property-name, indicator.remove($value, '+'));
+              }
+            }
+
+            $middle: property-name.name(indicator.remove($middle, '+'));
+            $middle: ($middle: $-property-name,);
+          }
+
+          // End: Check indicator.
+
+          @include class-property($middle, combine-get($combine, 2)) using($class_property1, $property-name1) {
+            // Set middle property name.
+            $property: map-set.set($property, middle, $property-name1 or $class_property1);
+            $property-base: null;
+            $property-common: null;
+
+            // FEATURE: Property is assigned to variant class name.
+            @if type-of($property-name) == map {
+              // Common.
+              @each $name, $property in $property-name {
+                @if $name == $class_property1 {
+                  $property-base: $property;
+                }
+                @if $name == '*' and not $property-common {
+                  $property-common: $property;
+                }
+              }
+
+              $property: map-set.set($property, base, $property-base or $property-common);
+            }
+
+            // ---
+            @if type-of($attribute-variant) == map {
+              // FEATURE: Variant 3
+              @each $attribute, $variant in $attribute-variant {
+                // FEATURE: Call function.
+                $attribute: if(
+                  meta.type-of($attribute) == list and list.length($attribute) > 1 and function-has.has($attribute),
+                  function-call-arglist.arglist($attribute...),
+                  $attribute
+                );
+                $variant: if(
+                  meta.type-of($variant) == list and list.length($variant) > 1 and function-has.has($variant),
+                  function-call-arglist.arglist($variant...),
+                  $variant
+                );
+
+                // End: Call function.
+                // Check indicator (+color) or (+radius) or (top, bottom) +radius.
+                @if meta.of-type(list string, $attribute) and indicator.index($attribute, '+') {
+                  $-property-name: ();
+                  @each $value in $attribute {
+                    @if indicator.index($value, '+') {
+                      $-property-name: list-append.append($-property-name, indicator.remove($value, '+'));
+                    }
+                  }
+
+                  $attribute: property-name.name(indicator.remove($attribute, '+'));
+                  $attribute: ($attribute: $-property-name,);
+                }
+
+                // End: Check indicator.
+                @include class-property($attribute, combine-get($combine, 3)) using($class_property2, $property-name2) {
+                  // FEATURE: Property is assigned to variant class name.
+                  @if type-of($property-name) == map {
+                    // Common.
+                    @each $name, $property in $property-name {
+                      @if $name == $class_property2 {
+                        $property-base: $property;
+                      }
+                    }
+
+                    $property: map-set.set($property, base, $property-base or $property-common);
+                  }
+
+                  @if type-of($variant) == map {
+                    // FEATURE: Variant 4.
+                    // @debug "Variant 4.";
+                    @each $value-class, $value in $variant {
+                      @include class-property($value-class, combine-get($combine, 4)) using($class_property3, $property-name3) {
+                        // FEATURE: Property is assigned to variant class name.
+                        @if type-of($property-name) == map {
+                          // Common.
+                          @each $name, $property in $property-name {
+                            @if $name == $class_property3 {
+                              $property-base: $property;
+                            }
+                          }
+
+                          $property: map-set.set($property, base, $property-base or $property-common);
+                        }
+
+                        // FEATURE: Check against multiple properties.
+                        $properties: [];
+                        @if property.multiple-is($value) {
+                          $properties: property.multiple(
+                            $value,
+                            $modifier,
+                            property,
+                            4,
+                            (base, map-get.get($property, base)),
+                            (middle, map-get.get($property, middle)),
+                            (attribute, $property-name2 or $class_property2)
+                          );
+                        } @else {
+                          $properties: (
+                            modifier.retrieve(
+                              $modifier,
+                              property,
+                              4,
+                              (base, map-get.get($property, base)),
+                              (middle, map-get.get($property, middle)),
+                              (attribute, $property-name2 or $class_property2),
+                              (prop-attribute, $property-name3),
+                              (value, $value)
+                            ),
+                          );
+                        }
+
+                        $rows: append(
+                          $rows,
+                          class.set(
+                            modifier.retrieve(
+                              $modifier,
+                              class,
+                              4,
+                              prefix,
+                              (base, $class_property),
+                              pre-middle,
+                              (middle, $class_property1),
+                              pre-attribute,
+                              (attribute, if(property.multiple-is($value), $class_property2, null)),
+                              prop-attribute,
+                              (value-class, if(property.multiple-is($value), null, $class_property3)),
+                              suffix
+                            )
+                          ),
+                          property.set($properties...)
+                        );
+                      }
+                    }
+                  } @else {
+                    // FEATURE: Variant 3.
+                    // @debug "Variant 3.";
+                    $value: $variant;
+
+                    // FEATURE: Check against multiple properties.
+                    $properties: [];
+                    @if property.multiple-is($value) {
+                      $properties: property.multiple(
+                        $value,
+                        $modifier,
+                        property,
+                        3,
+                        (base, map-get.get($property, base)),
+                        (middle, map-get.get($property, middle)),
+                        (attribute, $property-name2)
+                      );
+                    } @else {
+                      $properties: (
+                        modifier.retrieve(
+                          $modifier,
+                          property,
+                          3,
+                          (base, map-get.get($property, base)),
+                          (middle, map-get.get($property, middle)),
+                          (attribute, $property-name2),
+                          prop-attribute,
+                          (value, $value)
+                        ),
+                      );
+                    }
+
+                    $rows: append(
+                      $rows,
+                      class.set(
+                        modifier.retrieve(
+                          $modifier,
+                          class,
+                          3,
+                          prefix,
+                          (base, $class_property),
+                          pre-middle,
+                          (middle, $class_property1),
+                          pre-attribute,
+                          (attribute, if(property.multiple-is($value), $class_property2, null)),
+                          prop-attribute,
+                          (value-class, if(property.multiple-is($value), null, $class_property2)),
+                          suffix
+                        )
+                      ),
+                      property.set($properties...)
+                    );
+                  }
+                }
+              }
+            } @else {
+              // FEATURE: Variant 2.
+              // @debug "Variant 2.";
+              $value: $attribute-variant;
+
+              // FEATURE: Check against multiple properties.
+              $properties: [];
+              @if property.multiple-is($value) {
+                $properties: property.multiple(
+                  $value,
+                  $modifier,
+                  property,
+                  2,
+                  (base, map-get.get($property, base)),
+                  (middle, $property-name1),
+                  attribute
+                );
+              } @else {
+                $properties: (
+                  modifier.retrieve(
+                    $modifier,
+                    property,
+                    2,
+                    (base, map-get.get($property, base)),
+                    (middle, $property-name1),
+                    (value, $value),
+                  ),
+                );
+              }
+
+              // Append class and property to rows.
+              $rows: append(
+                $rows,
+                class.set(
+                  modifier.retrieve(
+                    $modifier,
+                    class,
+                    2,
+                    prefix,
+                    (base, $class_property),
+                    pre-middle,
+                    middle,
+                    pre-attribute,
+                    (attribute, if(property.multiple-is($value), $class_property1, null)),
+                    prop-attribute,
+                    (value-class, if(property.multiple-is($value), null, $class_property1)),
+                    suffix
+                  )
+                ),
+                property.set($properties...)
+              );
+            }
+          }
+        }
+      } @else {
+        // FEATURE: Variant 1.
+        // @debug "Variant 1.";
+        $value: $middle_attribute_variant;
+
+        // FEATURE: Check against multiple properties.
+        $properties: [];
+        @if property.multiple-is($value) {
+          $properties: property.multiple(
+            $value,
+            $modifier,
+            property,
+            1,
+            (base, map-get.get($property, base)),
+            middle,
+            attribute
+          );
+        } @else {
+          $properties: (
+            modifier.retrieve(
+              $modifier,
+              property,
+              1,
+              (base, map-get.get($property, base)),
+              middle,
+              attribute,
+              prop-attribute,
+              (value, $value)
+            ),
+          );
+        }
+
+        $rows: append(
+          $rows,
+          class.set(
+            modifier.retrieve(
+              $modifier,
+              class,
+              1,
+              prefix,
+              (base, $class_property),
+              pre-middle,
+              middle,
+              pre-attribute,
+              attribute,
+              prop-attribute,
+              value-class,
+              suffix
+            )
+          ),
+          property.set($properties...)
+        );
+      }
+    }
+  }
+  @content ($rows);
+}

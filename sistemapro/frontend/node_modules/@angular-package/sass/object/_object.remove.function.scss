@@ -1,0 +1,26 @@
+// Variables.
+@use 'object.var' as object;
+
+// Modules.
+@use '../map';
+
+// Functions.
+@use 'object.get-key.function' as *;
+@use 'object.get.function' as *;
+
+// Status: DONE
+// The `object.remove()` function removes `$keys` from object in use.
+// @arbitrary `$keys...` A list of keys to remove.
+// @returns The returned value is object in use.
+@function remove($keys...) {
+  @each $key in $keys {
+    @if type-of($key) == map {
+      @each $name, $key in $key {
+        object.$object: map.remove(object.$object, get-key($name, $key));
+      }
+    } @else {
+      object.$object: map.remove(object.$object, get-key($key: $key));
+    }
+  }
+  @return get();
+}

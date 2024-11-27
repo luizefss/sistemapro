@@ -1,0 +1,21 @@
+// Modules.
+@use '../../media';
+
+// Functions.
+@use 'theme.build.function';
+
+// Status: REVIEW:
+// The `color.theme-load()` mixin.
+// @param `$theme`
+// @arbitrary `$picks...`
+// @returns
+@mixin load($theme, $detect: false, $picks...) {
+  // $theme or $color-scheme
+  @each $theme, $palettes in theme.build($theme, $picks...) {
+    @include media.color-scheme-content($theme, $detect) {
+      @each $name, $variant in $palettes {
+        @content(($theme, $name, $variant)...);
+      }
+    }
+  }
+}

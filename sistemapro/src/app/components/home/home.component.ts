@@ -33,11 +33,19 @@ import UseCasesComponent from "./use-cases/use-cases.component";
     
   ],
   template: `
+<<<<<<< HEAD
   
 <app-use-cases />
 <app-testimonials />
 <app-support />
 <app-pricing />
+=======
+
+    <app-use-cases />
+    <app-testimonials />
+    <app-support />
+    <app-pricing />
+>>>>>>> 581a0d1 (errro)
     <app-integrations />
     <app-compare-plans />
     <app-solutions /> 
