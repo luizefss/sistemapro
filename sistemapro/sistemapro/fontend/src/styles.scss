@@ -1,0 +1,119 @@
+// Importações no topo
+@use '@angular/material' as mat;
+@use 'swiper/css' as *;
+@use 'swiper/css/navigation' as *;
+@use 'swiper/css/pagination' as *;
+@use 'swiper/css/scrollbar' as *;
+// src/styles.scss
+// src/styles.scss
+
+// Usar @use em vez de @import
+@import 'keen-slider/keen-slider.min.css';
+
+.solution-details-modal {
+    .mdc-dialog__surface {
+        border-radius: 16px;
+    }
+
+    .mdc-dialog__container {
+        padding: 0;
+    }
+}
+
+.solution-modal {
+    .mdc-dialog__surface {
+        border-radius: 15px;
+    }
+
+    .mdc-dialog__container {
+        padding: 0;
+    }
+}
+// Definição das paletas de cores
+.solution-details-modal {
+    .mat-mdc-dialog-container {
+        padding: 0;
+    }
+}
+
+// Definição do tema
+.cdk-overlay-container {
+    z-index: 1000;
+}
+
+.cdk-overlay-backdrop {
+    background-color: rgba(97, 93, 93, 0.6);
+    /* Ajuste a opacidade conforme necessário */
+}
+
+
+// Estilos globais
+html,
+body {
+    height: 100%;
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+section {
+    padding: 80px 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 0;
+    line-height: 1.2;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    /* Espaço entre os botões */
+}
+
+button[mat-flat-button] {
+    color: white;
+}
+
+button[mat-raised-button] {
+    font-weight: bold;
+}
+// src/styles/animations.scss
+.fade-in-up {
+    animation: fadeInUp 0.6s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hover-lift {
+    transition: all 0.2s ease-out;
+
+    &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+}
+
+.smooth-transition {
+    transition: all 0.3s ease-out;
+}
