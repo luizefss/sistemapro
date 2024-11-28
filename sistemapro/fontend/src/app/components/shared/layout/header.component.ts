@@ -1,9 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { Observable } from 'rxjs';
+import { ThemeService } from '../../../core/services/theme.service';
 import { LoginComponent } from '../../auth/login.component';
 import { RegisterComponent } from '../../auth/register.component';
 
@@ -41,15 +43,18 @@ import { RegisterComponent } from '../../auth/register.component';
             color="accent" 
             (click)="openLogin()">
             <mat-icon>login</mat-icon>
-                Entrar
-          
-                </button>
+            Entrar
+          </button>
           <button 
             mat-raised-button 
             color="primary"
-            (click)="openRegister()"
-          >
+            (click)="openRegister()">
             Começar Agora
+          </button>
+          <button 
+            mat-icon-button 
+            (click)="toggleTheme()">
+            <mat-icon>{{ (isDarkMode$ | async) ? 'light_mode' : 'dark_mode' }}</mat-icon>
           </button>
         </div>
       </div>
@@ -63,7 +68,7 @@ import { RegisterComponent } from '../../auth/register.component';
       right: 0;
       z-index: 1000;
       background: #fff;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .header-content {
@@ -76,41 +81,24 @@ import { RegisterComponent } from '../../auth/register.component';
       padding: 0 16px;
     }
 
-    .logo a {
-      text-decoration: none;
-      color: inherit;
-    }
-
-    .logo-text {
-      font-size: 1.5rem;
-      font-weight: 500;
-      color: #1976d2;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 8px;
-    }
-
-    .nav-links a {
-      font-weight: 400;
-      color: #333;
-    }
-
     .action-buttons {
       display: flex;
       gap: 8px;
     }
-
-    @media (max-width: 768px) {
-      .nav-links {
-        display: none;
-      }
-    }
   `]
 })
-export class HeaderComponent {
-  constructor(private dialog: MatDialog) {}
+export class HeaderComponent implements OnInit {
+  isDarkMode$!: Observable<boolean>;
+
+  constructor(private themeService: ThemeService, private dialog: MatDialog) {}
+
+  ngOnInit(): void {
+    this.isDarkMode$ = this.themeService.darkMode$;
+  }
+
+  toggleTheme() {
+    this.themeService.toggleTheme();
+  }
 
   openLogin() {
     this.dialog.open(LoginComponent, {
@@ -119,15 +107,16 @@ export class HeaderComponent {
     });
   }
 
-openRegister() {
-  const dialogRef = this.dialog.open(RegisterComponent, {
-    width: '400px',
-    panelClass: 'register-dialog'
-  });
+  openRegister() {
+    const dialogRef = this.dialog.open(RegisterComponent, {
+      width: '400px',
+      panelClass: 'register-dialog'
+    });
 
-  dialogRef.afterClosed().subscribe(result => {
-    if (result === 'login') {
-      this.openLogin();
-    }
-  });
-}}
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === 'login') {
+        this.openLogin();
+      }
+    });
+  }
+}
