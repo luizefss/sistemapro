@@ -5,7 +5,10 @@
 /tmp
 /out-tsc
 /bazel-out
-
+sistemapro/backend/.env
+.env
+backend/.env
+/backend/.env
 # Node
 /node_modules
 npm-debug.log
